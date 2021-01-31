@@ -11,10 +11,25 @@ import java.net.URL
 enum class DownloadStatus {
     OK, IDLE, NOT_INITIALISED, FAILED_OR_EMPTY, PERMISSIONS_ERROR, ERROR
 }
-class GetRawData : AsyncTask<String, Void, String>() {
+class GetRawData(private val listener: OnDownloadComplete) : AsyncTask<String, Void, String>() {
 
     private val TAG = "GetRawData"
     private var downloadStatus = DownloadStatus.IDLE
+
+    interface OnDownloadComplete {
+        fun onDownloadComplete(data: String, status: DownloadStatus)
+    }
+
+//    private var listener: MainActivity? = null
+//
+//    fun setDownloadCompleteListener(callbackObject: MainActivity) {
+//        listener = callbackObject
+//    }
+
+    override fun onPostExecute(result: String) {
+        Log.d(TAG, "onPostExecute called, parameter is $result")
+        listener.onDownloadComplete(result, downloadStatus)
+    }
 
     override fun doInBackground(vararg params: String?): String {
         if (params[0] == null) {
@@ -46,10 +61,6 @@ class GetRawData : AsyncTask<String, Void, String>() {
             Log.e(TAG, errorMessage)
             return errorMessage
         }
-    }
-
-    override fun onPostExecute(result: String?) {
-        Log.d(TAG, "onPostExecute called, parameter is $result")
     }
 
 }
