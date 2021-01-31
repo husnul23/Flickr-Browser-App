@@ -2,13 +2,13 @@ package com.husnul23.flickrbrowserapp
 
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import java.lang.Exception
 
-class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete {
+class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete, GetFlickrJsonData.OnDataAvailable {
+    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate called")
@@ -17,19 +17,14 @@ class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         val getRawData = GetRawData(this)
-//        getRawData.setDownloadCompleteListener(this)
         getRawData.execute("https://api.flickr.com/services/feeds/photos_public.gne?tags=android,oreo&format=json&nojsoncallback=1")
 
-//        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                    .setAction("Action", null).show()
-//        }
         Log.d(TAG, "onCreate ends")
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        Log.d(TAG, "onCreateOptionMenu called")
+        Log.d(TAG, "onCreateOptionsMenu called")
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -45,15 +40,29 @@ class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete {
         }
     }
 
-    companion object {
-        private const val TAG = "MainActivity"
-    }
+//    companion object {
+//        private const val TAG = "MainActivity"
+//    }
 
     override fun onDownloadComplete(data: String, status: DownloadStatus) {
         if (status == DownloadStatus.OK) {
-            Log.d(TAG, "onDownloadComplete called, data is $data")
+            Log.d(TAG, "onDownloadComplete called")
+
+            val getFlickrJsonData = GetFlickrJsonData(this)
+            getFlickrJsonData.execute(data)
         } else {
-            Log.d(TAG, "onDownloadComplete failed with status $status, Error mesage is: $data")
+            // download failed
+            Log.d(TAG, "onDownloadComplete failed with status $status. Error message is: $data")
         }
+    }
+
+    override fun onDataAvailable(data: List<Photo>) {
+        Log.d(TAG, ".onDataAvailable called, data is $data")
+
+        Log.d(TAG, ".onDataAvailable ends")
+    }
+
+    override fun onError(exception: Exception) {
+        Log.e(TAG, "onError called with ${exception.message}")
     }
 }
