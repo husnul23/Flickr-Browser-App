@@ -25,7 +25,7 @@ class GetFlickrJsonData(private val listener: OnDataAvailable) : AsyncTask<Strin
                 val tags = jsonPhoto.getString("tags")
 
                 val jsonMedia = jsonPhoto.getJSONObject("media")
-                val photoUrl = jsonPhoto.getString("m")
+                val photoUrl = jsonMedia.getString("m")
                 val link = photoUrl.replaceFirst("_m.jpg", "_b.jpg")
 
                 val photoObject = Photo(title, author, authorId, link, tags, photoUrl)
@@ -37,6 +37,7 @@ class GetFlickrJsonData(private val listener: OnDataAvailable) : AsyncTask<Strin
             e.printStackTrace()
             Log.e(TAG, "doInBackground: Error processing Json data. ${e.message}")
             //cancel(true)
+            cancel(true)
             listener.onError(e)
         }
 
