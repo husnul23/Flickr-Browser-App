@@ -1,22 +1,27 @@
 package com.husnul23.flickrbrowserapp
 
 import android.net.Uri
-import android.nfc.NdefRecord.createUri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.LinearLayoutManager
 import java.lang.Exception
+import kotlinx.android.synthetic.main.content_main.*
 
 class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete, GetFlickrJsonData.OnDataAvailable {
     private val TAG = "MainActivity"
+    private val flickrRecyclerViewAdapter = FlickrRecyclerViewAdapter(ArrayList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate called")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+
+        recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.adapter = flickrRecyclerViewAdapter
 
         val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne", "android,oreo", "en-us", true)
         val getRawData = GetRawData(this)
@@ -26,16 +31,16 @@ class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete, GetFlic
     }
 
     private fun createUri(baseURL: String, searchCriteria: String, lang: String, matchAll: Boolean): String {
-        Log.d(TAG, "createUri starts")
+        Log.d(TAG, ".createUri starts")
 
         return Uri.parse(baseURL).
-            buildUpon().
-            appendQueryParameter("tags", searchCriteria).
-            appendQueryParameter("tagmode", if (matchAll) "ALL" else "ANY").
-            appendQueryParameter("lang", lang).appendQueryParameter("format", "json").
-            appendQueryParameter("nojsoncallback", "1")
-            .build().toString()
-
+        buildUpon().
+        appendQueryParameter("tags", searchCriteria).
+        appendQueryParameter("tagmode", if (matchAll) "ALL" else "ANY").
+        appendQueryParameter("lang", lang).
+        appendQueryParameter("format", "json").
+        appendQueryParameter("nojsoncallback", "1").
+        build().toString()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -73,8 +78,8 @@ class MainActivity : AppCompatActivity(), GetRawData.OnDownloadComplete, GetFlic
     }
 
     override fun onDataAvailable(data: List<Photo>) {
-        Log.d(TAG, ".onDataAvailable called, data is $data")
-
+        Log.d(TAG, ".onDataAvailable called")
+        flickrRecyclerViewAdapter.loadNewData(data)
         Log.d(TAG, ".onDataAvailable ends")
     }
 
