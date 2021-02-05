@@ -2,7 +2,6 @@ package com.husnul23.flickrbrowserapp
 
 import android.os.Bundle
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.brows.*
 import kotlinx.android.synthetic.main.content_photo_detail.*
 
 class PhotoDetailActivity : BaseActivity() {
@@ -12,7 +11,7 @@ class PhotoDetailActivity : BaseActivity() {
         setContentView(R.layout.activity_photo_detail)
         activateToolbar(true)
 
-        val photo = intent.getSerializableExtra(PHOTO_TRANSFER) as Photo
+        val photo = intent.getParcelableExtra<Photo>(PHOTO_TRANSFER) as Photo
 
         photo_title.text = photo.title
         photo_tag.text = photo.tags
