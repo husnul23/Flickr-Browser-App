@@ -18,4 +18,5 @@
     <string name="browse_image_description">Downloaded Flickr photo</string>
     <string name="action_search">Search</string>
     <string name="searchable_hint">Enter photo tags</string>
+    <string name="empty_photo">No Photos match your search.\n\nUse the search icon to search for photos.</string>
 </resources>
