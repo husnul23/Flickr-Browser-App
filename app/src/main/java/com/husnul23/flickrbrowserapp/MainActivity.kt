@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.content_main.*
+import androidx.preference.PreferenceManager
 
 class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
         GetFlickrJsonData.OnDataAvailable, RecyclerItemClickListener.OnRecyclerListener{
@@ -26,10 +27,6 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.addOnItemTouchListener(RecyclerItemClickListener(this, recycler_view, this))
         recycler_view.adapter = flickrRecyclerViewAdapter
-
-        val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne", "android,oreo", "en-us", true)
-        val getRawData = GetRawData(this)
-        getRawData.execute(url)
 
         Log.d(TAG, "onCreate ends")
     }
@@ -108,6 +105,21 @@ class MainActivity : BaseActivity(), GetRawData.OnDownloadComplete,
 
     override fun onError(exception: Exception) {
         Log.e(TAG, "onError called with ${exception.message}")
+    }
+
+    override fun onResume() {
+        Log.d(TAG, ".onResume starts")
+        super.onResume()
+
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val queryResult = sharedPref.getString(FLICKR_QUERY, "")
+
+        if (queryResult != null && queryResult.isNotEmpty()) {
+            val url = createUri("https://api.flickr.com/services/feeds/photos_public.gne", queryResult, "en-us", true)
+            val getRawData = GetRawData(this)
+            getRawData.execute(url)
+        }
+        Log.d(TAG, ".onResume: ends")
     }
 
 }
